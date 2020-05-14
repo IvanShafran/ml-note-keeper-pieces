@@ -2,7 +2,6 @@ package com.github.ivanshafran.padsample
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -18,9 +17,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val isLandscapeTabletConfiguration = content_frame_layout == null
+        val isTabletConfiguration = content_frame_layout == null
         val listContainer: Int
-        if (isLandscapeTabletConfiguration) {
+        if (isTabletConfiguration) {
             listContainer = R.id.left_content_frame_layout
             detailContainer = R.id.right_content_frame_layout
         } else {
@@ -28,35 +27,10 @@ class MainActivity : AppCompatActivity() {
             detailContainer = R.id.content_frame_layout
         }
 
-        val oldListFragment: Fragment? = supportFragmentManager.findFragmentByTag(LIST_TAG)
-        val newListFragment: Fragment = ListFragment()
-        if (oldListFragment != null) {
-            // Pass state from old to the new instance
-            val state = supportFragmentManager.saveFragmentInstanceState(oldListFragment)
-            newListFragment.setInitialSavedState(state)
-
-            // remove fragment from the previous container
-            supportFragmentManager.beginTransaction().remove(oldListFragment).commit()
-        }
-
-        // add fragment to the new container
-        supportFragmentManager
-            .beginTransaction()
-            .add(listContainer, ListFragment(), LIST_TAG)
-            .commit()
-
-        val oldDetailFragment: Fragment? = supportFragmentManager.findFragmentByTag(DETAIL_TAG)
-        if (oldDetailFragment != null) {
-            val state = supportFragmentManager.saveFragmentInstanceState(oldDetailFragment)
-            val newDetailFragment = DetailFragment()
-            newDetailFragment.setInitialSavedState(state)
-
-            supportFragmentManager.popBackStack()
-
+        if (savedInstanceState == null) {
             supportFragmentManager
                 .beginTransaction()
-                .add(detailContainer, newDetailFragment, DETAIL_TAG)
-                .addToBackStack(null)
+                .replace(listContainer, ListFragment(), LIST_TAG)
                 .commit()
         }
     }
@@ -68,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .add(detailContainer, DetailFragment(), DETAIL_TAG)
+            .replace(detailContainer, DetailFragment(), DETAIL_TAG)
             .addToBackStack(null)
             .commit()
     }
